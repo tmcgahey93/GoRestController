@@ -15,7 +15,6 @@ func GoRestControllerHandler2(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Troy's Go RestController Second Entry Point Running")
 }
 
-// Commenting my code for comments sake
 func main() {
 	http.HandleFunc("/", GoRestControllerHandler)
 
