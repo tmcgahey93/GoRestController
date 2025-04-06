@@ -18,6 +18,10 @@ func (p person) Greet() string {
 	return "Hello, my name is " + p.name + " and I am " + fmt.Sprint(p.age) + " years old."
 }
 
+func (p *person) HaveBirthday() {
+	p.age++
+}
+
 func getEnvironmentHandler(w http.ResponseWriter, r *http.Request) {
 	returnMessage := "Troy's Go RestController Running in " + os.Getenv("ENV") + " mode"
 	fmt.Fprintln(w, returnMessage)
@@ -25,6 +29,7 @@ func getEnvironmentHandler(w http.ResponseWriter, r *http.Request) {
 
 func getTroyHandler(w http.ResponseWriter, r *http.Request) {
 	p := person{name: "Troy", age: 50}
+	p.HaveBirthday()
 	returnMessage := p.Greet()
 	fmt.Fprintln(w, returnMessage)
 }
