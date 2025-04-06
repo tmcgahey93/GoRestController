@@ -4,22 +4,45 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
-func GoRestControllerHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Troy's Go RestController Running")
-
+type person struct {
+	name string
+	age  int
 }
 
-func GoRestControllerHandler2(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Troy's Go RestController Second Entry Point Running")
+func (p person) Greet() string {
+	return "Hello, my name is " + p.name + " and I am " + fmt.Sprint(p.age) + " years old."
+}
+
+func getEnvironmentHandler(w http.ResponseWriter, r *http.Request) {
+	returnMessage := "Troy's Go RestController Running in " + os.Getenv("ENV") + " mode"
+	fmt.Fprintln(w, returnMessage)
+}
+
+func getTroyHandler(w http.ResponseWriter, r *http.Request) {
+	p := person{name: "Troy", age: 50}
+	returnMessage := p.Greet()
+	fmt.Fprintln(w, returnMessage)
 }
 
 func main() {
-	http.HandleFunc("/", GoRestControllerHandler)
 
-	http.HandleFunc("/anotherentrypoint", GoRestControllerHandler2)
+	env := os.Getenv("ENV")
+	if env == "development" || env == "" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+	}
 
-	fmt.Println("Server Running on portg 8080....")
+	http.HandleFunc("/getTroy", getTroyHandler)
+
+	http.HandleFunc("/getEnvironment", getEnvironmentHandler)
+
+	fmt.Println("Server Running on port 8080....")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
