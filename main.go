@@ -15,7 +15,7 @@ type person struct {
 }
 
 func (p person) Greet() string {
-	return "Hi, my name is " + p.name + " and I am " + fmt.Sprint(p.age) + " years old."
+	return "Hello, my name is " + p.name + " and I am " + fmt.Sprint(p.age) + " years old."
 }
 
 func (p *person) HaveBirthday() {
