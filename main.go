@@ -24,6 +24,24 @@ func (p *person) HaveBirthday() {
 	p.age++
 }
 
+type dog struct {
+	name string
+	age  int
+}
+
+func (d dog) Greet() string {
+	return "Hello, my name is " + d.name + " and I am " + fmt.Sprint(d.age) + " years old."
+}
+
+func (d *dog) HaveBirthday() {
+	d.age++
+}
+
+type mammal interface {
+	Greet() string
+	HaveBirthday()
+}
+
 type TimeResponse struct {
 	Datetime string `json:"datetime"`
 }
@@ -72,10 +90,21 @@ func getTimeHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, returnMessage)
 }
 
-func getTroyHandler(w http.ResponseWriter, r *http.Request) {
-	p := person{name: "Troy", age: 50}
-	p.HaveBirthday()
-	returnMessage := p.Greet()
+func getMammalHandler(w http.ResponseWriter, r *http.Request) {
+
+	var p *person = &person{name: "Troy", age: 50}
+	var d *dog = &dog{name: "Fido", age: 8}
+
+	var value mammal
+
+	if r.URL.Query().Get("type") == "person" {
+		value = p
+	} else {
+		value = d
+	}
+
+	value.HaveBirthday()
+	returnMessage := value.Greet()
 	fmt.Fprintln(w, returnMessage)
 }
 
@@ -89,7 +118,7 @@ func main() {
 		}
 	}
 
-	http.HandleFunc("/getTroy", getTroyHandler)
+	http.HandleFunc("/getMammal", getMammalHandler)
 
 	http.HandleFunc("/getEnvironment", getEnvironmentHandler)
 
