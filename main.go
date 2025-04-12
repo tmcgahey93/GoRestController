@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -90,6 +91,31 @@ func getTimeHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, returnMessage)
 }
 
+func callServiceB(w http.ResponseWriter, r *http.Request) {
+	url := os.Getenv("SERVICE_B_URL")
+	if url == "" {
+		http.Error(w, "SERVICE_B_URL not set in environment variables", http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := http.Get(url)
+	if err != nil {
+		http.Error(w, "Error calling Service B: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Read the response from Service B
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "Error reading response: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Return Service B's response to the client
+	fmt.Fprintf(w, "Service A got response: %s", body)
+}
+
 func getMammalHandler(w http.ResponseWriter, r *http.Request) {
 
 	var p *person = &person{name: "Troy", age: 50}
@@ -123,6 +149,8 @@ func main() {
 	http.HandleFunc("/getEnvironment", getEnvironmentHandler)
 
 	http.HandleFunc("/getTime", getTimeHandler)
+
+	http.HandleFunc("/callServiceB", callServiceB)
 
 	fmt.Println("Server Running on port 8080....")
 	log.Fatal(http.ListenAndServe(":8080", nil))

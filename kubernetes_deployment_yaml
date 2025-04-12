@@ -2,27 +2,19 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: gorestcontroller
+  name: primaryNamespace
 
 ---
-
-# Namespace
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: daemonset
-
----
-
 # ConfigMap
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: gorestcontroller-config
-  namespace: gorestcontroller
+  namespace: primaryNamespace
 data:
   ENV: "Production"
   TEST_VARIABLE: "PRODUCTION_ENVIRONMENT"
+  SERVICE_B_URL: "http://service-b"
 
 ---
 
@@ -31,7 +23,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gorestcontroller-deployment
-  namespace: gorestcontroller
+  namespace: primaryNamespace
 spec:
   replicas: 2
   selector:
@@ -58,7 +50,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gorestcontroller-service
-  namespace: gorestcontroller
+  namespace: primaryNamespace
 spec:
   type: LoadBalancer
   selector:
@@ -70,25 +62,25 @@ spec:
 
 ---
 
-# DaemonSet
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: example-daemonset
-  namespace: daemonset
-  labels:
-    app: example-daemon
-spec:
-  selector:
-    matchLabels:
-      app: example-daemon
-  template:
-    metadata:
-      labels:
-        app: example-daemon
-    spec:
-      containers:
-      - name: example-container
-        image: gorestcontroller:latest
-        ports:
-        - containerPort: 8080
+# DaemonSet 
+#apiVersion: apps/v1
+#kind: DaemonSet
+#metadata:
+#  name: example-daemonset
+#  namespace: daemonset
+#  labels:
+#    app: example-daemon
+#spec:
+#  selector:
+#    matchLabels:
+#      app: example-daemon
+#  template:
+#    metadata:
+#      labels:
+#        app: example-daemon
+#    spec:
+#      containers:
+#      - name: example-container
+#        image: gorestcontroller:latest
+#        ports:
+#        - containerPort: 8080
