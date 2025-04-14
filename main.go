@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type person struct {
@@ -143,6 +144,9 @@ func main() {
 			log.Fatal("Error loading .env file")
 		}
 	}
+
+	// Prometheus metrics endpoint
+	http.Handle("/metrics", promhttp.Handler())
 
 	http.HandleFunc("/getMammal", getMammalHandler)
 
